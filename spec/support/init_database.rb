@@ -9,6 +9,8 @@ ActiveRecord::Base.establish_connection(
 ActiveRecord::Base.connection.create_table :users do |table|
   table.string :username
   table.integer :reputation
+  # It's a bad idea
+  # use database default in this case
   table.decimal :coins, default: 0
   table.decimal :tax, default: 30
   table.references :level

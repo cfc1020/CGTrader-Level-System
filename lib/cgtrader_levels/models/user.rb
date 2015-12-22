@@ -1,27 +1,27 @@
 class CgtraderLevels::User < ActiveRecord::Base
-  attr_reader :level
+  VALUE_OF_REWARD = 7
+  VALUE_OF_PRIVILEGE = 1
 
-  after_initialize do
-    self.reputation = 0
+  cattr_writer :level_changer
 
-    matching_level = CgtraderLevels::Level.where(experience: reputation).first
-
-    if matching_level
-      self.level_id = matching_level.id
-      @level = matching_level
-    end
+  def self.level_changer
+    @@level_changer || CgtraderLevels::LevelChanger
   end
 
-  after_update :set_new_level
+  belongs_to :level
+
+  after_initialize :set_reputation
+
+  before_save :assign_new_level, if: :reputation_changed?
 
   private
 
-  def set_new_level
-    matching_level = CgtraderLevels::Level.where(experience: reputation).first
+  def set_reputation
+    self.reputation ||= 0 if self.new_record?
+    assign_new_level if self.new_record? # according to the tests, but I wouldn't do that
+  end
 
-    if matching_level
-      self.level_id = matching_level.id
-      @level = matching_level
-    end
+  def assign_new_level
+    self.class.level_changer.new(self).run
   end
 end

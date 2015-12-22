@@ -1,3 +1,5 @@
+# It would be good idea to add database_cleaner
+
 RSpec.configure do |config|
   config.before :each do
     ActiveRecord::Base.connection.tap do |connection|
